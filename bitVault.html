@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitVault 25'.exe</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <canvas id="paint-canvas"></canvas>
+
+    <div id="app-window" class="win-outset">
+        <div class="title-bar">
+            <div style="display:flex; align-items:center; gap:5px;">
+                <!-- Using Bitcoin logo as app icon since it is reliable -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg" width="16" height="16">
+                <span>BitVault 25'.exe</span>
+            </div>
+            <div class="title-bar-controls">
+                <button>_</button>
+                <button>X</button>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="menu-bar">
+                <span class="menu-item"><u>F</u>ile</span>
+                <span class="menu-item"><u>E</u>dit</span>
+                <span class="menu-item"><u>V</u>iew</span>
+                <span class="menu-item"><u>H</u>elp</span>
+            </div>
+
+            <h1
+                style="font-family: 'Press Start 2P', cursive; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg" width="40" height="40">
+                <span>BitVault <span style="font-size:1em; color:var(--win-blue);">25'</span></span>
+            </h1>
+
+            <div class="marquee-container win-inset">
+                <marquee scrollamount="5">> WELCOME TO THE FUTURE OF FINANCE > SECURE CONNECTION ESTABLISHED > GENERATE
+                    KEYS NOW</marquee>
+            </div>
+
+            <div id="entropy-phase">
+                <p class="instructions">
+                    Please move your pointing device to generate random entropy.<br>
+                    <span style="color:gray;">(Spray paint the screen to secure your wallet!)</span>
+                </p>
+
+                <div class="status-container win-inset">
+                    <div id="entropy-bar-fill" class="status-bar-fill"></div>
+                </div>
+                <div style="text-align:center; font-size:12px; margin-top:5px;">
+                    Progress: <span id="entropy-percent">0%</span>
+                </div>
+
+                <fieldset class="win-outset" style="margin-top: 15px; padding: 10px; border: 2px groove white;">
+                    <legend>System Log</legend>
+                    <textarea id="raw-entropy-stream" class="notepad-area win-inset" readonly></textarea>
+                </fieldset>
+
+                <!-- Initial Instructions -->
+                <div class="win-outset"
+                    style="padding: 10px; margin-top: 15px; background: var(--win-gray); font-size: 14px;">
+                    <strong><img src="https://win98icons.alexmeub.com/icons/png/help_book_big-0.png" width="16"
+                            height="16" style="vertical-align:middle"> How to use:</strong>
+                    <p style="margin: 5px 0;">
+                        1. <strong>Generate Entropy:</strong> Move your mouse cursor around the window.<br>
+                        2. <strong>Wait:</strong> The blue bar will fill up as you create randomness.<br>
+                        3. <strong>Secure:</strong> Once 100% is reached, your keys will be generated instantly.
+                    </p>
+                </div>
+            </div>
+
+            <div id="wallet-output" style="display:none; margin-top:20px;">
+                <div
+                    style="background:white; border:1px solid gray; padding:20px; margin-bottom:15px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+
+                    <!-- Security Warning -->
+                    <div
+                        style="background: #ffffc0; border: 1px solid #808000; padding: 10px; margin-bottom: 20px; font-size: 13px;">
+                        <img src="https://win98icons.alexmeub.com/icons/png/msg_warning-0.png"
+                            style="vertical-align: middle; margin-right: 5px;">
+                        <strong>SECURITY ALERT:</strong>
+                        <ul style="margin: 5px 0 5px 20px; padding: 0;">
+                            <li>Generated locally in your browser. No data is sent to any server.</li>
+                            <li style="color:red; font-weight:bold;">WRITE THESE DETAILS ON PAPER. Do not store
+                                digitally.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Bitcoin Address (Now First) -->
+                    <div class="key-group">
+                        <span class="label">Bitcoin Address:</span>
+                        <div style="display:flex; width: 100%;">
+                            <input type="text" class="value-box win-inset" id="addr-out" readonly
+                                style="background:#e0ffff; font-weight:bold;">
+                            <button class="btn-95 win-outset" onclick="copyToClipboard('addr-out')"
+                                style="margin-left:5px; padding: 2px 8px;" title="Copy to Clipboard">
+                                <img src="https://win98icons.alexmeub.com/icons/png/paste-0.png" width="16" height="16">
+                            </button>
+                            <button class="btn-95 win-outset" onclick="checkBalance()"
+                                style="margin-left:5px; padding: 2px 8px; color: var(--win-blue);"
+                                title="View on Block Explorer">
+                                🔍 Check Balance
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Private Key (WIF) (Now Second) -->
+                    <div class="key-group">
+                        <span class="label">Private Key (WIF):</span>
+                        <div style="display:flex; width: 100%;">
+                            <input type="text" class="value-box win-inset" id="wif-out" readonly>
+                            <button class="btn-95 win-outset" onclick="copyToClipboard('wif-out')"
+                                style="margin-left:5px; padding: 2px 8px;" title="Copy to Clipboard">
+                                <img src="https://win98icons.alexmeub.com/icons/png/paste-0.png" width="16" height="16">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="key-group">
+                        <span class="label">Hex Key:</span>
+                        <div style="display:flex; width: 100%;">
+                            <input type="text" class="value-box win-inset" id="priv-hex-out" readonly
+                                style="color:gray;">
+                            <button class="btn-95 win-outset" onclick="copyToClipboard('priv-hex-out')"
+                                style="margin-left:5px; padding: 2px 8px;" title="Copy to Clipboard">
+                                <img src="https://win98icons.alexmeub.com/icons/png/paste-0.png" width="16" height="16">
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Info Section -->
+                <div class="win-outset"
+                    style="padding: 10px; margin-bottom: 15px; background: var(--win-gray); font-size: 14px;">
+                    <strong><img src="https://win98icons.alexmeub.com/icons/png/help_book_big-0.png" width="16"
+                            height="16" style="vertical-align:middle"> How to use:</strong>
+                    <p style="margin: 5px 0;">
+                        1. <strong>Safe Storage:</strong> Keep your Paper Wallet in a fireproof safe.<br>
+                        2. <strong
+                            style="background: yellow; color: black; padding: 0 4px; border: 1px dotted black;">Check
+                            Balance:</strong> Search your <u>Bitcoin Address</u> on <a
+                            href="https://www.blockchain.com/explorer" target="_blank"
+                            style="color:var(--win-blue)">blockchain.com</a> or use the 🔍 button above.<br>
+                        3. <strong>Recover:</strong> Use the WIF Private Key to import funds into any modern wallet
+                        software.
+                    </p>
+                </div>
+
+                <div style="text-align:center;">
+                    <button class="btn-95 win-outset" onclick="location.reload()">Generate New</button>
+                    <button class="btn-95 win-outset" onclick="window.print()">Print Page</button>
+                    <button class="btn-95 win-outset" onclick="window.close()">Exit</button>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 20px; border-top: 1px solid gray; padding-top: 5px; font-size: 13px; font-weight: bold; color: #333;">
+                BitVault 25' Generator v1.0 | Created by M0N1SH | Copyright © 2025 | Verified Secure Execution
+                (Client-Side Only)
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
